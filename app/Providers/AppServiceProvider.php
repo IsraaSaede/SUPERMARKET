@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-
+use Illuminate\Support\Facades\URL;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -25,19 +25,22 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        $this->configureDefaults();
-
-        // مشاركة متغير الإعدادات مع جميع الواجهات بأمان
-        try {
-            if (Schema::hasTable('settings')) {
-                View::share('settings', Setting::first());
-            }
-        } catch (\Throwable $e) {
-            // يتجاهل الخطأ إذا كانت قاعدة البيانات غير متصلة أثناء الـ Build
-        }
+ {
+    // إجبار النظام على استخدام https لملفات الـ CSS والـ JS على Railway
+    if (app()->isProduction()) {
+        URL::forceScheme('https');
     }
 
+    $this->configureDefaults();
+
+    try {
+        if (Schema::hasTable('settings')) {
+            View::share('settings', Setting::first());
+        }
+    } catch (\Throwable $e) {
+        //
+    }
+}
     /**
      * Configure default behaviors for production-ready applications.
      */
