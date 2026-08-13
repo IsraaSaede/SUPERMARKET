@@ -6,9 +6,10 @@ use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,17 +26,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 1. تفعيل الإعدادات الافتراضية للمشروع
         $this->configureDefaults();
 
-        // 2. حماية الاتصال بقاعدة البيانات أثناء البناء (Build Phase)
+        // مشاركة متغير الإعدادات مع جميع الواجهات بأمان
         try {
             if (Schema::hasTable('settings')) {
-                // أعد كودك السابق هنا إذا كنت تجلب إعدادات الموقع
-                // مثال: View::share('settings', Setting::first());
+                View::share('settings', Setting::first());
             }
         } catch (\Throwable $e) {
-            // يتجاهل الخطأ إذا كانت قاعدة البيانات غير متصلة أثناء البناء
+            // يتجاهل الخطأ إذا كانت قاعدة البيانات غير متصلة أثناء الـ Build
         }
     }
 
