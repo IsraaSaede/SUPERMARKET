@@ -1,6 +1,6 @@
 FROM php:8.5-apache
 
-# Install required system packages, configure extensions, and manage Apache modules
+# Install required system packages and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -24,8 +24,6 @@ RUN apt-get update && apt-get install -y \
         gd \
         intl \
         zip \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
