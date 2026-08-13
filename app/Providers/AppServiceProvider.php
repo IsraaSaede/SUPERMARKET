@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-
+use Illuminate\Support\Facades\Schema;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,10 +21,17 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     */public function boot(): void
+     */
+    public function boot(): void
 {
-    view()->share('settings', Setting::first());
-
+    try {
+        // ضغ كود الاستعلام الخاص بك هنا داخل الـ try
+        if (Schema::hasTable('settings')) {
+            // $settings = Setting::first();
+        }
+    } catch (\Throwable $e) {
+        // يتجاهل الخطأ إذا كانت قاعدة البيانات غير متصلة أثناء الـ Build
+    }
 }
     /**
      * Configure default behaviors for production-ready applications.
