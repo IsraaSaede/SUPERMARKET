@@ -20,14 +20,12 @@ class CategoryForm
                     ->required()
                     ->maxLength(255)
                     ->autofocus(),
-
                 FileUpload::make('image')
                     ->label('صورة التصنيف')
                     ->image()
                     ->imageEditor()
-                    ->disk('public')
+                    ->disk('cloudinary')
                     ->directory('categories')
-                    ->visibility('public')
                     ->maxSize(2048)
                     ->helperText('يفضل استخدام صورة مربعة وواضحة.'),
 

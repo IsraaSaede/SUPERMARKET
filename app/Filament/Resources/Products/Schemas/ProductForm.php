@@ -33,9 +33,10 @@ Select::make('category_id')
                     ->prefix('$'),
 
                 FileUpload::make('image')
-                    ->image()
-                    ->directory('products'),
-
+                ->image()
+                ->disk('cloudinary')
+                ->directory('products'),
+                
                 TextInput::make('stock')
                     ->required()
                     ->numeric()

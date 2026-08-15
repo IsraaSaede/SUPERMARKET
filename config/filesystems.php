@@ -38,6 +38,10 @@ return [
             'report' => false,
         ],
 
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -76,7 +80,5 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
-'cloudinary' => [
-    'driver' => 'cloudinary',
-],
+
 ];

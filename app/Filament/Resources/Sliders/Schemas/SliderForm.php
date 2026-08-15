@@ -18,9 +18,10 @@ class SliderForm
                     ->maxLength(255),
 
                 FileUpload::make('image')
-                    ->image()
-                    ->directory('sliders')
-                    ->required(),
+                ->image()
+                ->disk('cloudinary')
+                ->directory('sliders')
+                ->required(),
 
                 Textarea::make('description')
                     ->columnSpanFull(),
