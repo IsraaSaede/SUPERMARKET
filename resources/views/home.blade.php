@@ -4,6 +4,64 @@
 
 @section('content')
 
+    {{-- السلايدر --}}
+    @if ($sliders->isNotEmpty())
+        <section class="mb-12" x-data="{
+                active: 0,
+                total: {{ $sliders->count() }},
+                start() {
+                    setInterval(() => {
+                        this.active = (this.active + 1) % this.total;
+                    }, 4000);
+                }
+            }" x-init="start()">
+
+            <div class="relative rounded-xl overflow-hidden shadow-sm">
+
+                @foreach ($sliders as $index => $slider)
+                    <div x-show="active === {{ $index }}"
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         class="relative w-full aspect-[16/6] bg-slate-100">
+
+                        <img src="{{ asset('storage/' . $slider->image) }}"
+                             alt="{{ $slider->title }}"
+                             class="w-full h-full object-cover">
+
+                        @if ($slider->title || $slider->description)
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
+                                @if ($slider->title)
+                                    <h3 class="text-white text-xl md:text-2xl font-bold">{{ $slider->title }}</h3>
+                                @endif
+
+                                @if ($slider->description)
+                                    <p class="text-white/90 text-sm mt-1">{{ $slider->description }}</p>
+                                @endif
+                            </div>
+                        @endif
+
+                    </div>
+                @endforeach
+
+                {{-- نقاط التنقل --}}
+                @if ($sliders->count() > 1)
+                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                        @foreach ($sliders as $index => $slider)
+                            <button
+                                type="button"
+                                x-on:click="active = {{ $index }}"
+                                class="w-2.5 h-2.5 rounded-full transition"
+                                :class="active === {{ $index }} ? 'bg-white' : 'bg-white/50'"
+                            ></button>
+                        @endforeach
+                    </div>
+                @endif
+
+            </div>
+        </section>
+    @endif
+
     {{-- الأصناف --}}
     <section class="mb-12">
         <h2 class="text-2xl font-bold mb-5 text-slate-900">تسوق حسب الصنف</h2>

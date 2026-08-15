@@ -9,9 +9,20 @@
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-sm sticky top-0 z-10">
+    <header class="bg-white shadow-sm sticky top-0 z-10" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-6xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between gap-4">
+
+                {{-- زرار القائمة (موبايل فقط) --}}
+                <button
+                    type="button"
+                    x-on:click="mobileMenuOpen = !mobileMenuOpen"
+                    class="sm:hidden text-2xl text-slate-900 shrink-0"
+                    aria-label="فتح القائمة"
+                >
+                    ☰
+                </button>
+
                 <a href="{{ route('home') }}" class="flex items-center gap-2 text-xl font-bold text-slate-900 shrink-0">
                     <img src="{{ asset('images/logo.png') }}"
                         alt="{{ $settings->store_name ?? 'سوبر ماركت' }}"
@@ -29,6 +40,18 @@
                     <a href="{{ route('contact') }}" class="hover:text-orange-600 transition hidden sm:inline">تواصل معنا</a>
                     <livewire:cart-icon />
                 </nav>
+            </div>
+
+            {{-- قائمة الموبايل المنسدلة --}}
+            <div
+                x-show="mobileMenuOpen"
+                x-on:click.outside="mobileMenuOpen = false"
+                x-transition
+                class="sm:hidden mt-4 pb-2 border-t pt-4 flex flex-col gap-3 text-sm font-medium"
+                style="display: none;"
+            >
+                <a href="{{ route('home') }}" class="hover:text-orange-600 transition">الرئيسية</a>
+                <a href="{{ route('contact') }}" class="hover:text-orange-600 transition">تواصل معنا</a>
             </div>
         </div>
     </header>
