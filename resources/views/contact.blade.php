@@ -6,13 +6,12 @@
 
     <h2 class="text-2xl font-bold mb-6 text-slate-900 text-center">تواصل معنا</h2>
 
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-full">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-xl mx-auto">
 
         <div class="flex justify-center mb-4">
             <img src="{{ asset('images/logo.png') }}"
                 alt="{{ $settings->store_name ?? 'سوبر ماركت' }}"
-                class="h-16 w-16 object-cover rounded-full"
-                style="max-width: 64px; max-height: 64px;">
+                class="h-32 w-32 object-contain">
         </div>
 
         <h3 class="text-xl font-bold text-center text-slate-900 mb-6">

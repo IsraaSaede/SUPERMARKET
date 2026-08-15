@@ -15,8 +15,7 @@
                 <a href="{{ route('home') }}" class="flex items-center gap-2 text-xl font-bold text-slate-900 shrink-0">
                     <img src="{{ asset('images/logo.png') }}"
                         alt="{{ $settings->store_name ?? 'سوبر ماركت' }}"
-                        class="h-9 w-9 shrink-0 object-cover rounded-full"
-                        style="max-width: 36px; max-height: 36px;">
+                        class="h-10 w-10 shrink-0 object-contain">
 
                     <span class="hidden sm:inline">{{ $settings->store_name ?? 'سوبر ماركت' }}</span>
                 </a>
