@@ -8,17 +8,18 @@
 
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-full">
 
-        @if ($settings?->logo)
-    <img src="{{ asset('storage/' . $settings->logo) }}"
-         alt="{{ $settings->store_name }}"
-         class="h-32 w-32 rounded-full object-cover mx-auto mb-4">
-@endif
+        <div class="flex justify-center mb-4">
+            <img src="{{ asset('images/logo.png') }}"
+                alt="{{ $settings->store_name ?? 'سوبر ماركت' }}"
+                class="h-16 w-16 object-cover rounded-full"
+                style="max-width: 64px; max-height: 64px;">
+        </div>
 
         <h3 class="text-xl font-bold text-center text-slate-900 mb-6">
             {{ $settings->store_name ?? 'سوبر ماركت' }}
         </h3>
 
-        <div class="space-y-4" >
+        <div class="space-y-4">
 
             @if ($settings?->address)
                 <div class="flex items-start gap-3">
@@ -48,8 +49,8 @@
                     <div>
                         <p class="text-sm text-gray-500">واتساب</p>
                         <a href="https://wa.me/{{ preg_replace('/\D/', '', $settings->whatsapp_number) }}"
-                           target="_blank"
-                           class="font-medium hover:text-orange-600 transition" dir="ltr">
+                        target="_blank"
+                        class="font-medium hover:text-orange-600 transition" dir="ltr">
                             {{ $settings->whatsapp_number }}
                         </a>
                     </div>
