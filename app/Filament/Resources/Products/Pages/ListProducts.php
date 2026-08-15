@@ -14,9 +14,9 @@ class ListProducts extends ListRecords
     protected function getHeaderActions(): array
     {  return [
             CreateAction::make()
-                ->label('إضافة تصنيف')
+                ->label('إضافة منتج')
                 ->icon('heroicon-o-plus'),
         ];
-    
+
     }
 }
