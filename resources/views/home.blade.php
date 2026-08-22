@@ -267,8 +267,7 @@
 </div>
 
 <div class="mt-10 flex justify-center">
-    {{ $products->links() }}
-</div>
+{{ $products->links('vendor.pagination.tailwind') }}</div>
 
 </section>
     </section>
