@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
+use Cloudinary\Cloudinary;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 
 class SliderForm
@@ -14,14 +15,37 @@ class SliderForm
     {
         return $schema
             ->components([
+
                 TextInput::make('title')
                     ->maxLength(255),
 
                 FileUpload::make('image')
-                ->image()
-                ->disk('cloudinary')
-                ->directory('sliders')
-                ->required(),
+                    ->label('صورة السلايدر')
+                    ->image()
+                    ->imageEditor()
+                    ->maxSize(4096)
+                    ->saveUploadedFileUsing(function ($file) {
+                        $cloudinary = new Cloudinary([
+                            'cloud' => [
+                                'cloud_name' => config('services.cloudinary.cloud_name'),
+                                'api_key' => config('services.cloudinary.api_key'),
+                                'api_secret' => config('services.cloudinary.api_secret'),
+                            ],
+                        ]);
+
+                        $result = $cloudinary
+                            ->uploadApi()
+                            ->upload(
+                                $file->getRealPath(),
+                                [
+                                    'folder' => 'supermarket/sliders',
+                                    'resource_type' => 'image',
+                                ]
+                            );
+
+                        return $result['secure_url'];
+                    })
+                    ->required(),
 
                 Textarea::make('description')
                     ->columnSpanFull(),
