@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -14,8 +15,24 @@ class Product extends Model
         'stock',
         'is_active',
         'category_id',
-    ]; public function category()
+    ];
+
+    public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * رابط صورة المنتج (يدعم روابط Cloudinary الكاملة والملفات المحلية)
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->image
+                ? (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')
+                    ? $this->image
+                    : asset('storage/' . $this->image))
+                : null,
+        );
     }
 }
