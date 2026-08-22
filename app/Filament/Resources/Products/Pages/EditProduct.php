@@ -14,6 +14,11 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+
+        \Filament\Actions\CreateAction::make()
+            ->label('إضافة منتج')
+            ->icon('heroicon-o-plus')
+            ->url(ProductResource::getUrl('create')),
             DeleteAction::make()
                 ->label('حذف المنتج')
                 ->icon('heroicon-o-trash')

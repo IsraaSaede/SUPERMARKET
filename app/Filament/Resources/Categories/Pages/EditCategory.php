@@ -15,7 +15,12 @@ class EditCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make()
+            \Filament\Actions\CreateAction::make()
+                ->label('إضافة تصنيف')
+                ->icon('heroicon-o-plus')
+                ->url(CategoryResource::getUrl('create')),
+
+                DeleteAction::make()
                 ->label('حذف التصنيف')
                 ->icon('heroicon-o-trash')
                 ->requiresConfirmation(),
