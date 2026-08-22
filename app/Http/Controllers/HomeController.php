@@ -18,8 +18,7 @@ class HomeController extends Controller
 
         $products = Product::where('is_active', true)
             ->latest()
-            ->take(12)
-            ->get();
+            ->paginate(12);
 
         return view('home', [
             'sliders' => $sliders,

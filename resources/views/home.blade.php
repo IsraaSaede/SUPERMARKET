@@ -264,7 +264,13 @@
             @endforelse
 
         </div>
+</div>
 
+<div class="mt-10 flex justify-center">
+    {{ $products->links() }}
+</div>
+
+</section>
     </section>
 
 @endsection
