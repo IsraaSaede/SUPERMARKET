@@ -17,7 +17,7 @@ class StoreStatsOverview extends BaseWidget
 
         $totalCategories = Category::count();
 
-        $lowStock = Product::where('stock', '<=', 3)
+        $lowStock = Product::where('stock', '<=', 5)
             ->where('is_active', true)
             ->count();
 

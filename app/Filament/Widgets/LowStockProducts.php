@@ -1,48 +1,27 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Resources\Products\Pages;
 
-use App\Models\Product;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
+use App\Filament\Resources\Products\ProductResource;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Resources\Pages\ListRecords;
 
-class LowStockProducts extends BaseWidget
+class LowStockProducts extends ListRecords
 {
-    protected static ?string $heading = 'تنبيه المخزون';
+    protected static string $resource = ProductResource::class;
 
-    protected static ?int $sort = 3;
+    protected static ?string $title = 'المخزون المنخفض';
 
-    public function table(Table $table): Table
+    public function getHeading(): string
     {
-        return $table
-            ->query(
-                Product::query()
-                    ->where('is_active', true)
-                    ->where('stock', '<=', 5)
-                    ->orderBy('stock')
-            )
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label('المنتج')
-                    ->weight('bold'),
+        return 'المنتجات منخفضة المخزون';
+    }
 
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('التصنيف'),
-
-                Tables\Columns\TextColumn::make('stock')
-                    ->label('الكمية المتبقية')
-                    ->badge()
-                    ->color('danger'),
-
-                Tables\Columns\TextColumn::make('price')
-                    ->label('السعر')
-                    ->suffix(' ل.س')
-                    ->numeric(),
-            ])
-            ->emptyStateHeading('المخزون جيد')
-            ->emptyStateDescription('لا توجد منتجات ذات مخزون منخفض حاليًا.')
-            ->emptyStateIcon('heroicon-o-check-circle')
-            ->paginated(false);
+    protected function getTableQuery(): Builder
+    {
+        return parent::getTableQuery()
+            ->where('is_active', true)
+            ->where('stock', '<=', 5)
+            ->orderBy('stock', 'asc');
     }
 }

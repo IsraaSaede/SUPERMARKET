@@ -33,7 +33,11 @@ class ProductsTable
                     ->label('اسم المنتج')
                     ->searchable()
                     ->sortable()
-                    ->rules(['required', 'string', 'max:255'])
+                    ->rules([
+                        'required',
+                        'string',
+                        'max:255',
+                    ])
                     ->width('250px'),
 
                 // التصنيف
@@ -47,17 +51,22 @@ class ProductsTable
                 // السعر - تعديل مباشر
                 TextInputColumn::make('price')
                     ->label('السعر')
-                    ->numeric()
-                    ->rules(['required', 'numeric', 'min:0'])
-                    ->suffix(' ل.س')
+                    ->rules([
+                        'required',
+                        'numeric',
+                        'min:0',
+                    ])
                     ->sortable()
                     ->width('140px'),
 
                 // المخزون - تعديل مباشر
                 TextInputColumn::make('stock')
                     ->label('المخزون')
-                    ->numeric()
-                    ->rules(['required', 'integer', 'min:0'])
+                    ->rules([
+                        'required',
+                        'integer',
+                        'min:0',
+                    ])
                     ->sortable()
                     ->width('120px')
                     ->color(fn ($record) => match (true) {
