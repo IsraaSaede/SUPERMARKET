@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -27,13 +28,13 @@ class ProductsTable
                     ->square()
                     ->size(60),
 
-                // اسم المنتج
-                TextColumn::make('name')
+                // اسم المنتج - تعديل مباشر
+                TextInputColumn::make('name')
                     ->label('اسم المنتج')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
-                    ->limit(40),
+                    ->rules(['required', 'string', 'max:255'])
+                    ->width('250px'),
 
                 // التصنيف
                 TextColumn::make('category.name')
@@ -43,15 +44,27 @@ class ProductsTable
                     ->badge()
                     ->color('info'),
 
-                // السعر
-                TextColumn::make('price')
+                // السعر - تعديل مباشر
+                TextInputColumn::make('price')
                     ->label('السعر')
-                    ->numeric(
-                        decimalPlaces: 2
-                    )
+                    ->numeric()
+                    ->rules(['required', 'numeric', 'min:0'])
                     ->suffix(' ل.س')
                     ->sortable()
-                    ->weight('bold'),
+                    ->width('140px'),
+
+                // المخزون - تعديل مباشر
+                TextInputColumn::make('stock')
+                    ->label('المخزون')
+                    ->numeric()
+                    ->rules(['required', 'integer', 'min:0'])
+                    ->sortable()
+                    ->width('120px')
+                    ->color(fn ($record) => match (true) {
+                        $record->stock <= 0 => 'danger',
+                        $record->stock <= 5 => 'warning',
+                        default => 'success',
+                    }),
 
                 // الحالة
                 IconColumn::make('is_active')

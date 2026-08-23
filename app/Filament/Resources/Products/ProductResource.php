@@ -13,7 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
+use App\Filament\Resources\Products\Pages\LowStockProducts;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
@@ -91,6 +91,7 @@ class ProductResource extends Resource
             'index' => ListProducts::route('/'),
             'create' => CreateProduct::route('/create'),
             'edit' => EditProduct::route('/{record}/edit'),
+            'low-stock' => LowStockProducts::route('/low-stock'),
         ];
     }
 }

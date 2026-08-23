@@ -17,7 +17,7 @@ class StoreStatsOverview extends BaseWidget
 
         $totalCategories = Category::count();
 
-        $lowStock = Product::where('stock', '<=', 5)
+        $lowStock = Product::where('stock', '<=', 3)
             ->where('is_active', true)
             ->count();
 
@@ -55,7 +55,8 @@ class StoreStatsOverview extends BaseWidget
             )
                 ->description('منتجات تحتاج إلى متابعة')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color($lowStock > 0 ? 'danger' : 'success'),
+                ->color($lowStock > 0 ? 'danger' : 'success')
+                ->url('/admin/products/low-stock')
         ];
     }
 }
