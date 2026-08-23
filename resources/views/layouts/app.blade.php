@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -16,12 +18,29 @@
     @vite('resources/css/app.css')
 
     @livewireStyles
+
+    {{-- ==================== Google Analytics ==================== --}}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8KPPTLQ2HB"></script>
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-8KPPTLQ2HB');
+    </script>
+
 </head>
 
 
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
     {{-- ==================== Header ==================== --}}
+
     <header
         class="bg-white border-b border-slate-200 sticky top-0 z-50"
         x-data="{ mobileMenuOpen: false }"
@@ -32,6 +51,7 @@
             <div class="min-h-[76px] flex items-center gap-4">
 
                 {{-- زر القائمة للموبايل --}}
+
                 <button
                     type="button"
                     x-on:click="mobileMenuOpen = !mobileMenuOpen"
@@ -43,6 +63,7 @@
 
 
                 {{-- الشعار --}}
+
                 <a
                     href="{{ route('home') }}"
                     class="flex items-center gap-3 shrink-0"
@@ -62,12 +83,16 @@
 
 
                 {{-- البحث --}}
+
                 <div class="flex-1 max-w-2xl mx-auto">
+
                     <livewire:search-products />
+
                 </div>
 
 
                 {{-- القائمة --}}
+
                 <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold shrink-0">
 
                     <a
@@ -88,14 +113,18 @@
 
 
                 {{-- السلة --}}
+
                 <div class="shrink-0">
+
                     <livewire:cart-icon />
+
                 </div>
 
             </div>
 
 
             {{-- قائمة الموبايل --}}
+
             <div
                 x-show="mobileMenuOpen"
                 x-on:click.outside="mobileMenuOpen = false"
@@ -130,6 +159,7 @@
 
 
     {{-- ==================== Main ==================== --}}
+
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 flex-1 w-full">
 
         @yield('content')
@@ -138,6 +168,7 @@
 
 
     {{-- ==================== Footer ==================== --}}
+
     <footer class="bg-slate-900 text-slate-300 mt-16">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -159,9 +190,13 @@
                 </div>
 
                 <p class="text-sm text-slate-400">
+
                     &copy; {{ date('Y') }}
+
                     {{ $settings->store_name ?? 'سوبر ماركت' }}.
+
                     جميع الحقوق محفوظة.
+
                 </p>
 
             </div>
