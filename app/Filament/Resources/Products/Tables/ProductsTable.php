@@ -69,10 +69,16 @@ class ProductsTable
                     ])
                     ->sortable()
                     ->width('120px')
-                    ->color(fn ($record) => match (true) {
-                        $record->stock <= 0 => 'danger',
-                        $record->stock <= 5 => 'warning',
-                        default => 'success',
+                    ->color(function ($record) {
+                        if ($record->stock <= 0) {
+                            return 'danger';
+                        }
+
+                        if ($record->stock <= 5) {
+                            return 'warning';
+                        }
+
+                        return 'success';
                     }),
 
                 // الحالة
@@ -93,7 +99,6 @@ class ProductsTable
 
             ])
 
-            // الفلاتر
             ->filters([
 
                 SelectFilter::make('category_id')
@@ -110,7 +115,6 @@ class ProductsTable
 
             ])
 
-            // أزرار كل منتج
             ->recordActions([
 
                 EditAction::make()
@@ -124,7 +128,6 @@ class ProductsTable
 
             ])
 
-            // العمليات الجماعية
             ->toolbarActions([
 
                 BulkActionGroup::make([
