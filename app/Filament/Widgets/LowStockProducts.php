@@ -1,27 +1,47 @@
 <?php
 
-namespace App\Filament\Resources\Products\Pages;
+namespace App\Filament\Widgets;
 
-use App\Filament\Resources\Products\ProductResource;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Resources\Pages\ListRecords;
+use App\Models\Product;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget as BaseWidget;
 
-class LowStockProducts extends ListRecords
+class LowStockProductsWidget extends BaseWidget
 {
-    protected static string $resource = ProductResource::class;
+    protected static ?string $heading = 'تنبيه المخزون';
 
-    protected static ?string $title = 'المخزون المنخفض';
+    protected static ?int $sort = 3;
 
-    public function getHeading(): string
+    public function table(Table $table): Table
     {
-        return 'المنتجات منخفضة المخزون';
-    }
+        return $table
+            ->query(
+                Product::query()
+                    ->where('is_active', true)
+                    ->where('stock', '<=', 5)
+                    ->orderBy('stock')
+            )
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label('المنتج')
+                    ->weight('bold'),
 
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()
-            ->where('is_active', true)
-            ->where('stock', '<=', 5)
-            ->orderBy('stock', 'asc');
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('التصنيف'),
+
+                Tables\Columns\TextColumn::make('stock')
+                    ->label('الكمية المتبقية')
+                    ->badge()
+                    ->color('danger'),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->label('السعر')
+                    ->suffix(' ل.س'),
+            ])
+            ->emptyStateHeading('المخزون جيد')
+            ->emptyStateDescription('لا توجد منتجات ذات مخزون منخفض حاليًا.')
+            ->emptyStateIcon('heroicon-o-check-circle')
+            ->paginated(false);
     }
 }

@@ -20,7 +20,8 @@ class LowStockProducts extends ListRecords
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
+            ->where('is_active', true)
             ->where('stock', '<=', 5)
-            ->where('is_active', true);
+            ->orderBy('stock', 'asc');
     }
 }

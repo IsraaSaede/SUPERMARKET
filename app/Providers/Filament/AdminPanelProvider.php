@@ -15,7 +15,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-
+use App\Filament\Widgets\LowStockProductsWidget;
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
 
             // ألوان المتجر
             ->colors([
-               'primary' => [
+            'primary' => [
     50 => '#f8fafc',
     100 => '#f1f5f9',
     200 => '#e2e8f0',
@@ -103,8 +103,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Widgets\StoreStatsOverview::class,
                 \App\Filament\Widgets\LatestProducts::class,
-                \App\Filament\Widgets\LowStockProducts::class,
-            ])
+    LowStockProductsWidget::class,            ])
 
             // Middleware
             ->middleware([
