@@ -75,22 +75,27 @@ class ProductsTable
                         'min:0',
                     ])
                     ->sortable()
-                    ->width('120px')
-                    ->color(function ($record) {
-                        if ($record->stock <= 0) {
-                            return 'danger';
-                        }
+                    ->width('120px'),
 
-                        if ($record->stock <= 5) {
-                            return 'warning';
-                        }
-
-                        return 'success';
+                // حالة المخزون - عرض فقط بلون تنبيهي
+                TextColumn::make('stock_status')
+                    ->label('الحالة')
+                    ->badge()
+                    ->getStateUsing(fn ($record) => $record->stock)
+                    ->formatStateUsing(fn ($state) => match (true) {
+                        $state <= 0 => 'نفذ',
+                        $state <= 5 => 'منخفض',
+                        default => 'متوفر',
+                    })
+                    ->color(fn ($state) => match (true) {
+                        $state <= 0 => 'danger',
+                        $state <= 5 => 'warning',
+                        default => 'success',
                     }),
 
                 // الحالة
                 IconColumn::make('is_active')
-                    ->label('الحالة')
+                    ->label('مفعل؟')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
