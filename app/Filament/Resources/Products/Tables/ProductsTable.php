@@ -51,17 +51,24 @@ class ProductsTable
                 // السعر - تعديل مباشر
                 TextInputColumn::make('price')
                     ->label('السعر')
+                    ->type('number')
+                    ->inputMode('decimal')
+                    ->step('any')
                     ->rules([
                         'required',
                         'numeric',
                         'min:0',
                     ])
+                    ->suffix(' ل.س')
                     ->sortable()
                     ->width('140px'),
 
                 // المخزون - تعديل مباشر
                 TextInputColumn::make('stock')
                     ->label('المخزون')
+                    ->type('number')
+                    ->inputMode('numeric')
+                    ->step('1')
                     ->rules([
                         'required',
                         'integer',
