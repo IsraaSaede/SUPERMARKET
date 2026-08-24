@@ -13,6 +13,8 @@ class LatestProducts extends BaseWidget
 
     protected static ?int $sort = 2;
 
+    protected int | string | array $columnSpan = 'full';
+
     public function table(Table $table): Table
     {
         return $table
@@ -20,22 +22,23 @@ class LatestProducts extends BaseWidget
                 Product::query()
                     ->with('category')
                     ->latest()
+                    ->limit(5)
             )
             ->columns([
+
                 Tables\Columns\ImageColumn::make('image')
-                    ->label('الصورة')
+                    ->label('')
                     ->square()
-                    ->size(45),
+                    ->size(40),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('المنتج')
-                    ->searchable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->limit(25),
 
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('التصنيف')
-                    ->badge()
-                    ->color('primary'),
+                    ->badge(),
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('السعر')
@@ -54,8 +57,8 @@ class LatestProducts extends BaseWidget
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('الحالة')
                     ->boolean(),
+
             ])
-            ->paginated(false)
-            ->defaultPaginationPageOption(5);
+            ->paginated(false);
     }
 }
