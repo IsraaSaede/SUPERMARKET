@@ -55,10 +55,12 @@ class OrderResource extends Resource
                     ->searchable(),
 
                 TextColumn::make('phone')
-                    ->label('الهاتف'),
+                    ->label('الهاتف')
+                    ->searchable(),
 
                 TextColumn::make('area')
-                    ->label('الحي'),
+                    ->label('الحي')
+                    ->searchable(),
 
                 TextColumn::make('total')
                     ->label('الإجمالي')
@@ -68,41 +70,50 @@ class OrderResource extends Resource
                 TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
-                    ->formatStateUsing(function ($state) {
-                        return match ($state) {
-                            'new' => 'جديد',
-                            'completed' => 'مكتمل',
-                            'cancelled' => 'ملغي',
-                            default => $state,
-                        };
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'new' => 'جديد',
+                        'processing' => 'قيد المعالجة',
+                        'completed' => 'مكتمل',
+                        'cancelled' => 'ملغي',
+                        default => $state,
                     })
                     ->colors([
                         'warning' => 'new',
+                        'info' => 'processing',
                         'success' => 'completed',
                         'danger' => 'cancelled',
                     ]),
 
                 TextColumn::make('created_at')
                     ->label('التاريخ')
-                    ->dateTime('Y-m-d H:i'),
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable(),
             ])
+
+            ->defaultSort('created_at', 'desc')
+
             ->filters([
                 SelectFilter::make('status')
                     ->label('الحالة')
                     ->options([
                         'new' => 'جديد',
+                        'processing' => 'قيد المعالجة',
                         'completed' => 'مكتمل',
                         'cancelled' => 'ملغي',
                     ]),
             ])
+
             ->actions([
                 EditAction::make(),
             ])
+
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+
+            ->paginated([10, 25, 50]);
     }
 
     public static function getRelations(): array

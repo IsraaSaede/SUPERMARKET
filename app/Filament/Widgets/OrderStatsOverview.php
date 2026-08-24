@@ -3,103 +3,96 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class OrderStatsOverview extends BaseWidget
 {
+
     protected function getStats(): array
     {
 
-        $totalOrders = Order::count();
+        $stats = Cache::remember('order_stats', 60, function () {
 
-        $totalSales = Order::sum('total');
+            return [
 
+                'totalOrders' => Order::count(),
 
-        $averageOrder = Order::avg('total') ?? 0;
+                'totalSales' => Order::sum('total'),
 
+                'averageOrder' => Order::avg('total') ?? 0,
 
-        $todaySales = Order::whereDate(
-            'created_at',
-            today()
-        )->sum('total');
-
-
-        $weekSales = Order::whereBetween(
-            'created_at',
-            [
-                now()->startOfWeek(),
-                now()->endOfWeek()
-            ]
-        )->sum('total');
+                'todaySales' => Order::whereBetween('created_at', [
+                    now()->startOfDay(),
+                    now()->endOfDay()
+                ])->sum('total'),
 
 
-        $monthSales = Order::whereMonth(
-            'created_at',
-            now()->month
-        )->sum('total');
+                'weekSales' => Order::whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ])->sum('total'),
 
 
-        $todayOrders = Order::whereDate(
-            'created_at',
-            today()
-        )->count();
+                'monthSales' => Order::whereBetween('created_at', [
+                    now()->startOfMonth(),
+                    now()->endOfMonth()
+                ])->sum('total'),
 
+
+                'todayOrders' => Order::whereBetween('created_at', [
+                    now()->startOfDay(),
+                    now()->endOfDay()
+                ])->count(),
+
+            ];
+
+        });
 
 
         return [
 
             Stat::make(
                 'إجمالي الطلبات',
-                $totalOrders
+                $stats['totalOrders']
             )
-            ->description('كل الطلبات')
-            ->descriptionIcon('heroicon-m-shopping-cart')
             ->color('primary'),
 
 
             Stat::make(
                 'إجمالي المبيعات',
-                number_format($totalSales,2).' ل.س'
+                number_format($stats['totalSales'],2).' ل.س'
             )
-            ->description('كل المبيعات')
-            ->descriptionIcon('heroicon-m-banknotes')
             ->color('success'),
-
 
 
             Stat::make(
                 'متوسط الطلب',
-                number_format($averageOrder,2).' ل.س'
+                number_format($stats['averageOrder'],2).' ل.س'
             )
-            ->description('متوسط قيمة الطلب')
-            ->descriptionIcon('heroicon-m-calculator')
             ->color('info'),
-
 
 
             Stat::make(
                 'مبيعات اليوم',
-                number_format($todaySales,2).' ل.س'
+                number_format($stats['todaySales'],2).' ل.س'
             )
-            ->description("طلبات اليوم {$todayOrders}")
+            ->description("طلبات اليوم {$stats['todayOrders']}")
             ->color('warning'),
-
 
 
             Stat::make(
                 'مبيعات الأسبوع',
-                number_format($weekSales,2).' ل.س'
+                number_format($stats['weekSales'],2).' ل.س'
             )
-            ->description('هذا الأسبوع')
             ->color('primary'),
+
 
             Stat::make(
                 'مبيعات الشهر',
-                number_format($monthSales,2).' ل.س'
+                number_format($stats['monthSales'],2).' ل.س'
             )
-            ->description('هذا الشهر')
             ->color('success'),
 
         ];

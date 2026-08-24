@@ -18,22 +18,27 @@ class BestSellingProducts extends TableWidget
         return $table
             ->query(
                 OrderItem::query()
-                    ->selectRaw('product_name as id, product_name, SUM(quantity) as sold')
+                    ->selectRaw('MIN(order_items.id) as row_id, product_name, SUM(quantity) as sold')
                     ->groupBy('product_name')
                     ->orderByDesc('sold')
                     ->limit(10)
             )
+
+            ->recordTitleAttribute('product_name')
+
             ->columns([
+
                 Tables\Columns\TextColumn::make('product_name')
                     ->label('المنتج'),
 
                 Tables\Columns\TextColumn::make('sold')
                     ->label('الكمية المباعة')
                     ->numeric()
-                    ->sortable()
                     ->badge()
                     ->color('success'),
+
             ])
+
             ->paginated(false);
     }
 }
