@@ -188,15 +188,13 @@
                     </span>
 
                 </div>
-
                 <p class="text-sm text-slate-400">
-
-                    &copy; {{ date('Y') }}
-
-                    {{ $settings->store_name ?? 'سوبر ماركت' }}.
-
-                    جميع الحقوق محفوظة.
-
+                    &copy; {{ date('Y') }} سوبر ماركت الباشا
+                    <br>
+                    تطوير وبرمجة:
+                    <a href="mailto:israasaede@gmail.com" class="hover:text-white transition">
+                        israa saede
+                    </a>
                 </p>
 
             </div>

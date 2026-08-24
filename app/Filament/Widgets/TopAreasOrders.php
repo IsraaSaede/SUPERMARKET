@@ -18,10 +18,9 @@ class TopAreasOrders extends TableWidget
         return $table
             ->query(
                 Order::query()
-                    ->selectRaw('area as id, area, COUNT(*) as total_orders')
+                    ->selectRaw('area, COUNT(*) as total_orders')
                     ->groupBy('area')
                     ->orderByDesc('total_orders')
-                    ->limit(10)
             )
             ->columns([
                 Tables\Columns\TextColumn::make('area')
@@ -30,7 +29,6 @@ class TopAreasOrders extends TableWidget
                 Tables\Columns\TextColumn::make('total_orders')
                     ->label('عدد الطلبات')
                     ->numeric()
-                    ->sortable()
                     ->badge()
                     ->color('info'),
             ])
