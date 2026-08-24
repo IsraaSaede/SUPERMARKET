@@ -32,6 +32,7 @@ class TopAreasOrders extends TableWidget
                     ->badge()
                     ->color('info'),
             ])
+            ->defaultSort(null)
             ->paginated(false);
     }
 }
