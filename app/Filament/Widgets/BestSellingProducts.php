@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\OrderItem;
+use Illuminate\Support\Facades\DB;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -17,14 +17,14 @@ class BestSellingProducts extends TableWidget
     {
         return $table
             ->query(
-                OrderItem::query()
-                    ->selectRaw('MIN(order_items.id) as row_id, product_name, SUM(quantity) as sold')
+                DB::table('order_items')
+                    ->select([
+                        'product_name',
+                        DB::raw('SUM(quantity) as sold'),
+                    ])
                     ->groupBy('product_name')
                     ->orderByDesc('sold')
-                    ->limit(10)
             )
-
-            ->recordTitleAttribute('product_name')
 
             ->columns([
 
