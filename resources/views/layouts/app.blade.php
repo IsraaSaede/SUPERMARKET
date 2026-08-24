@@ -176,7 +176,7 @@
             <div class="text-center">
 
                 <div class="flex justify-center items-center gap-3 mb-3">
-
+{{--
                     <img
                         src="{{ asset('images/logo.png') }}"
                         alt="{{ $settings->store_name ?? 'سوبر ماركت' }}"
@@ -185,7 +185,7 @@
 
                     <span class="font-bold text-white">
                         {{ $settings->store_name ?? 'سوبر ماركت' }}
-                    </span>
+                    </span>  --}}
 
                 </div>
                 <p class="text-sm text-slate-400">

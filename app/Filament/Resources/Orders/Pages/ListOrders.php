@@ -4,8 +4,6 @@ namespace App\Filament\Resources\Orders\Pages;
 
 use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Widgets\OrderStatsOverview;
-// use App\Filament\Widgets\TopAreasOrders;
-// use App\Filament\Widgets\OrderSalesChart;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
@@ -21,14 +19,6 @@ class ListOrders extends ListRecords
     {
         return [
             OrderStatsOverview::class,
-        ];
-    }
-
-    protected function getFooterWidgets(): array
-    {
-        return [
-            // TopAreasOrders::class,
-            // OrderSalesChart::class,
         ];
     }
 }
