@@ -3,62 +3,25 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Widgets\Widget;
 
-class LatestProducts extends BaseWidget
+class LatestProducts extends Widget
 {
-    protected static ?string $heading = 'أحدث المنتجات';
+    protected static string $view = 'filament.widgets.latest-products';
 
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'default' => 'full',
+        'lg' => 2,
+    ];
 
-    public function table(Table $table): Table
+    public function getProducts()
     {
-        return $table
-            ->query(
-                Product::query()
-                    ->with('category')
-                    ->latest()
-                    ->limit(5)
-            )
-            ->columns([
-
-                Tables\Columns\ImageColumn::make('image')
-                    ->label('')
-                    ->square()
-                    ->size(40),
-
-                Tables\Columns\TextColumn::make('name')
-                    ->label('المنتج')
-                    ->weight('bold')
-                    ->limit(25),
-
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('التصنيف')
-                    ->badge(),
-
-                Tables\Columns\TextColumn::make('price')
-                    ->label('السعر')
-                    ->suffix(' ل.س')
-                    ->numeric(),
-
-                Tables\Columns\TextColumn::make('stock')
-                    ->label('المخزون')
-                    ->badge()
-                    ->color(fn ($state) =>
-                        $state <= 5
-                            ? 'danger'
-                            : ($state <= 10 ? 'warning' : 'success')
-                    ),
-
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('الحالة')
-                    ->boolean(),
-
-            ])
-            ->paginated(false);
+        return Product::query()
+            ->with('category')
+            ->latest()
+            ->limit(6)
+            ->get();
     }
 }
