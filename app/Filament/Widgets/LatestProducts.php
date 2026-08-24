@@ -7,7 +7,7 @@ use Filament\Widgets\Widget;
 
 class LatestProducts extends Widget
 {
-    protected static string $view = 'filament.widgets.latest-products';
+    protected string $view = 'filament.widgets.latest-products';
 
     protected static ?int $sort = 2;
 
