@@ -2,6 +2,7 @@
 
 use App\Services\CartService;
 use Livewire\Component;
+use App\Models\Product;
 
 new class extends Component
 {
@@ -9,34 +10,27 @@ new class extends Component
 
     public int $quantity = 1;
 
-public function add(CartService $cart)
-{
-    try {
-
-        $cart->add($this->productId, $this->quantity);
-
-        $this->dispatch('cart-updated');
-
-        $this->quantity = 1;
-
-        $this->resetErrorBag('stock');
-
-    } catch (\RuntimeException $e) {
-
-        $this->addError('stock', $e->getMessage());
-
-    }
-}
-
-    public function increment()
+    public function add(CartService $cart)
     {
-        $this->quantity++;
-    }
-
-    public function decrement()
-    {
-        if ($this->quantity > 1) {
-            $this->quantity--;
+        try {
+            // جلب المنتج من قاعدة البيانات
+            $product = Product::with('category')->findOrFail($this->productId);
+            // إضافة المنتج للسلة
+            $cart->add($this->productId, $this->quantity);
+            // إرسال بيانات المنتج إلى المتصفح لتسجيلها في Google Analytics
+            $this->dispatch('analytics-add-to-cart', [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'price' => (float) $product->price,
+                'category' => $product->category?->name,
+                'quantity' => $this->quantity,
+                'value' => (float) $product->price * $this->quantity,
+            ]);
+            $this->dispatch('cart-updated');
+            $this->quantity = 1;
+            $this->resetErrorBag('stock');
+        } catch (\RuntimeException $e) {
+            $this->addError('stock', $e->getMessage());
         }
     }
 };

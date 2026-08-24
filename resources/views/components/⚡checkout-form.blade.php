@@ -5,6 +5,8 @@ use App\Services\CartService;
 use Livewire\Attributes\Validate;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
 new class extends Component
 {
@@ -50,11 +52,59 @@ public string $phone = '';
         $subtotal = $cart->getTotalPrice();
         $deliveryFee = $this->calculateDeliveryFee($subtotal, $settings);
         $grandTotal = $subtotal + $deliveryFee;
+        try {
+            DB::transaction(function () use (
+                $items,
+                $subtotal,
+                $deliveryFee,
+                $grandTotal
+            ) {
 
+                $order = Order::create([
+                    'customer_name' => $this->name,
+                    'phone' => $this->phone,
+                    'area' => $this->area,
+                    'street' => $this->street,
+                    'building' => $this->building,
+                    'floor' => $this->floor,
+                    'notes' => $this->notes,
+                    'subtotal' => $subtotal,
+                    'delivery_fee' => $deliveryFee,
+                    'total' => $grandTotal,
+                ]);
+
+                foreach ($items as $item) {
+
+                    $order->items()->create([
+                        'product_id' => $item['product']->id,
+                        'product_name' => $item['product']->name,
+                        'quantity' => $item['quantity'],
+                        'price' => $item['product']->price,
+                        'subtotal' => $item['subtotal'],
+                    ]);
+
+                }
+
+            });
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            $this->addError(
+                'cart',
+                'حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.'
+            );
+
+            return;
+        }
         $message = $this->buildMessage($items, $subtotal, $deliveryFee, $grandTotal, $settings->store_name);
 
         $storeNumber = preg_replace('/\D/', '', $settings->whatsapp_number);
 
+        $this->dispatch('analytics-whatsapp-order', [
+            'value' => $grandTotal,
+        ]);
         $cart->clear();
 
         return redirect()->away(

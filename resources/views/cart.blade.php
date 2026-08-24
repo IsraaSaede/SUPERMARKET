@@ -10,4 +10,14 @@
     <div class="mt-8">
         <livewire:checkout-form />
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        gtag('event', 'view_cart');
+
+    });
+</script>
+
 @endsection
+

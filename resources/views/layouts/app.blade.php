@@ -207,7 +207,35 @@
 
 
     @livewireScripts
-
+    <script>
+        document.addEventListener('livewire:init', () => {
+            // ==============================
+            // إضافة منتج إلى السلة
+            // ==============================
+            Livewire.on('analytics-add-to-cart', (data) => {
+                gtag('event', 'add_to_cart', {
+                    currency: 'SYP',
+                    value: Number(data.value),
+                    items: [{
+                        item_id: String(data.product_id),
+                        item_name: data.product_name,
+                        item_category: data.category || undefined,
+                        price: Number(data.price),
+                        quantity: Number(data.quantity)
+                    }]
+                });
+            });
+            // ==============================
+            // إرسال الطلب عبر واتساب
+            // ==============================
+            Livewire.on('analytics-whatsapp-order', (data) => {
+                gtag('event', 'whatsapp_order', {
+                    currency: 'SYP',
+                    value: Number(data.value)
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

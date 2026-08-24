@@ -17,7 +17,9 @@ use Filament\Tables\Table;
 class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
-
+    protected static ?string $modelLabel = 'سلايدر';
+    protected static ?string $pluralModelLabel = 'السلايدرات';
+    protected static ?string $navigationLabel = 'السلايدرات';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'Slider';

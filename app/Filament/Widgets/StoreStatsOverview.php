@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Order;
 
 class StoreStatsOverview extends BaseWidget
 {
@@ -16,7 +17,16 @@ class StoreStatsOverview extends BaseWidget
         $activeProducts = Product::where('is_active', true)->count();
 
         $totalCategories = Category::count();
+        $totalOrders = Order::count();
 
+        $newOrders = Order::where('status','new')
+            ->count();
+
+
+        $todaySales = Order::whereDate(
+            'created_at',
+            today()
+        )->sum('total');
         $lowStock = Product::where('stock', '<=', 5)
             ->where('is_active', true)
             ->count();
@@ -56,7 +66,34 @@ class StoreStatsOverview extends BaseWidget
                 ->description('منتجات تحتاج إلى متابعة')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($lowStock > 0 ? 'danger' : 'success')
-                ->url('/admin/products/low-stock')
-        ];
-    }
+                ->url('/admin/products/low-stock'),
+
+            Stat::make(
+                'إجمالي الطلبات',
+                $totalOrders
+            )
+            ->description('كل الطلبات')
+            ->descriptionIcon('heroicon-m-shopping-cart')
+            ->color('primary')
+            ->url('/admin/orders'),
+
+            Stat::make(
+                'طلبات جديدة',
+                $newOrders
+            )
+            ->description('تحتاج متابعة')
+            ->descriptionIcon('heroicon-m-bell')
+            ->color('warning')
+            ->url('/admin/orders'),
+
+            Stat::make(
+                'مبيعات اليوم',
+                number_format($todaySales,2).' ل.س'
+            )
+            ->description('إجمالي اليوم')
+            ->descriptionIcon('heroicon-m-banknotes')
+            ->color('success'),
+            ];
+
+        }
 }
