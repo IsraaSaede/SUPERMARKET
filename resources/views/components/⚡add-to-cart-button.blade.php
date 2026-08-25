@@ -7,11 +7,16 @@ use App\Models\Product;
 new class extends Component
 {
     public int $productId;
-
     public int $quantity = 1;
-
-    public function add(CartService $cart)
-    {
+    public function increment(){
+        $this->quantity++;
+    }
+    public function decrement(){
+        if ($this->quantity > 1) {
+            $this->quantity--;
+        }
+    }
+    public function add(CartService $cart){
         try {
             // جلب المنتج من قاعدة البيانات
             $product = Product::with('category')->findOrFail($this->productId);
