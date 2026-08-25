@@ -65,16 +65,32 @@ public function increment(int $productId, CartService $cart)
             @foreach ($items as $item)
                 <div class="bg-white rounded-xl border border-gray-200 p-3 flex items-center gap-3" wire:key="cart-item-{{ $item['product']->id }}">
 
-                    <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
-                        @if ($item['product']->image)
-                            <img src="{{ asset('storage/' . $item['product']->image) }}"
-                                 alt="{{ $item['product']->name }}"
-                                 class="w-full h-full object-cover">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center text-gray-300 text-2xl">🛒</div>
-                        @endif
-                    </div>
+                <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
 
+                    @php
+                        $image = $item['product']->image;
+
+                        $imageUrl = $image
+                            ? (
+                                str_starts_with($image, 'http://') ||
+                                str_starts_with($image, 'https://')
+                                ? $image
+                                : asset('storage/' . $image)
+                            )
+                            : null;
+                    @endphp
+
+                    @if ($imageUrl)
+                        <img src="{{ $imageUrl }}"
+                            alt="{{ $item['product']->name }}"
+                            class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-300 text-2xl">
+                            🛒
+                        </div>
+                    @endif
+
+                </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-medium text-sm truncate">{{ $item['product']->name }}</p>
                         <p class="text-orange-600 font-bold text-sm">{{ number_format($item['product']->price, 2) }} ل.س</p>
