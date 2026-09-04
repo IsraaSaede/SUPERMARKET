@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use RuntimeException;
+use App\Models\Setting;
 
 class CartService
 {
@@ -139,18 +140,33 @@ class CartService
         return $this->getDetailedItems()->sum('subtotal');
     }
 
-    /**
-     * رسم توصيل ثابت يُقرأ من config/cart.php (وليس من قاعدة البيانات).
-     * صفر إذا كانت السلة فارغة.
-     */
-    public function getDeliveryFee(): float
-    {
-        if ($this->getTotalQuantity() === 0) {
-            return 0.0;
-        }
-
-        return (float) config('cart.delivery_fee', 0);
+/**
+ * حساب رسوم التوصيل من إعدادات المتجر.
+ * التوصيل مجاني عند الوصول إلى الحد المحدد.
+ */
+public function getDeliveryFee(): float
+{
+    if ($this->getTotalQuantity() === 0) {
+        return 0.0;
     }
+
+    $settings = Setting::first();
+
+    if (! $settings) {
+        return 0.0;
+    }
+
+    $subtotal = $this->getTotalPrice();
+
+    if (
+        $settings->free_delivery_threshold !== null &&
+        $subtotal >= $settings->free_delivery_threshold
+    ) {
+        return 0.0;
+    }
+
+    return (float) $settings->delivery_fee;
+}
 
     /**
      * إجمالي المنتجات + التوصيل.
