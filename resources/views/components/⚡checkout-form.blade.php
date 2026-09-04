@@ -13,20 +13,11 @@ new class extends Component
     #[Validate('required|string|max:100')]
     public string $name = '';
 
-    #[Validate('required|string|max:100')]
-    public string $area = '';
+    #[Validate('required|string|max:255')]
+    public string $address = '';
 
-    #[Validate('required|string|max:100')]
-    public string $street = '';
-
-    #[Validate('nullable|string|max:20')]
-    public string $building = '';
-
-    #[Validate('nullable|string|max:20')]
-    public string $floor = '';
-
- #[Validate(['required', 'string', 'regex:/^(09\d{8}|(\+?963)9\d{8})$/'])]
-public string $phone = '';
+    #[Validate(['required', 'string', 'regex:/^(09\d{8}|(\+?963)9\d{8})$/'])]
+    public string $phone = '';
 
     #[Validate('nullable|string|max:500')]
     public string $notes = '';
@@ -52,6 +43,7 @@ public string $phone = '';
         $subtotal = $cart->getTotalPrice();
         $deliveryFee = $this->calculateDeliveryFee($subtotal, $settings);
         $grandTotal = $subtotal + $deliveryFee;
+
         try {
             DB::transaction(function () use (
                 $items,
@@ -59,14 +51,10 @@ public string $phone = '';
                 $deliveryFee,
                 $grandTotal
             ) {
-
                 $order = Order::create([
                     'customer_name' => $this->name,
                     'phone' => $this->phone,
-                    'area' => $this->area,
-                    'street' => $this->street,
-                    'building' => $this->building,
-                    'floor' => $this->floor,
+                    'address' => $this->address,
                     'notes' => $this->notes,
                     'subtotal' => $subtotal,
                     'delivery_fee' => $deliveryFee,
@@ -74,7 +62,6 @@ public string $phone = '';
                 ]);
 
                 foreach ($items as $item) {
-
                     $order->items()->create([
                         'product_id' => $item['product']->id,
                         'product_name' => $item['product']->name,
@@ -82,13 +69,9 @@ public string $phone = '';
                         'price' => $item['product']->price,
                         'subtotal' => $item['subtotal'],
                     ]);
-
                 }
-
             });
-
         } catch (\Throwable $e) {
-
             report($e);
 
             $this->addError(
@@ -98,6 +81,7 @@ public string $phone = '';
 
             return;
         }
+
         $message = $this->buildMessage($items, $subtotal, $deliveryFee, $grandTotal, $settings->store_name);
 
         $storeNumber = preg_replace('/\D/', '', $settings->whatsapp_number);
@@ -105,6 +89,7 @@ public string $phone = '';
         $this->dispatch('analytics-whatsapp-order', [
             'value' => $grandTotal,
         ]);
+
         $cart->clear();
 
         return redirect()->away(
@@ -129,17 +114,7 @@ public string $phone = '';
         $lines[] = '';
         $lines[] = '📋 بيانات الزبون:';
         $lines[] = "الاسم: {$this->name}";
-        $lines[] = "الحي: {$this->area}";
-        $lines[] = "الشارع: {$this->street}";
-
-        if ($this->building) {
-            $lines[] = "رقم العمارة: {$this->building}";
-        }
-
-        if ($this->floor) {
-            $lines[] = "الطابق: {$this->floor}";
-        }
-
+        $lines[] = "العنوان: {$this->address}";
         $lines[] = "رقم التواصل: {$this->phone}";
 
         if ($this->notes) {
@@ -157,36 +132,40 @@ public string $phone = '';
         $lines[] = 'المجموع الفرعي: ' . number_format($subtotal, 2) . ' ل.س';
         $lines[] = 'رسوم التوصيل: ' . ($deliveryFee > 0 ? number_format($deliveryFee, 2) . ' ل.س' : 'مجاني 🎉');
         $lines[] = 'الإجمالي الكلي: ' . number_format($grandTotal, 2) . ' ل.س';
+        $lines[] = '';
+        $lines[] = '💵 طريقة الدفع: كاش أو شام كاش عند الاستلام';
+        $lines[] = '🚚 موعد التوصيل المتوقع: خلال ساعة';
 
         return implode("\n", $lines);
     }
 
-   public function with(CartService $cart): array
-{
-    $settings = Setting::first();
-    $subtotal = $cart->getTotalPrice();
-    $deliveryFee = $settings ? $this->calculateDeliveryFee($subtotal, $settings) : 0;
+    public function with(CartService $cart): array
+    {
+        $settings = Setting::first();
+        $subtotal = $cart->getTotalPrice();
+        $deliveryFee = $settings ? $this->calculateDeliveryFee($subtotal, $settings) : 0;
 
-    return [
-        'subtotal' => $subtotal,
-        'deliveryFee' => $deliveryFee,
-        'grandTotal' => $subtotal + $deliveryFee,
-        'freeDeliveryThreshold' => $settings->free_delivery_threshold ?? null,
-        'hasItems' => $cart->getTotalQuantity() > 0,
-    ];
-}
-#[On('cart-updated')]
+        return [
+            'subtotal' => $subtotal,
+            'deliveryFee' => $deliveryFee,
+            'grandTotal' => $subtotal + $deliveryFee,
+            'freeDeliveryThreshold' => $settings->free_delivery_threshold ?? null,
+            'hasItems' => $cart->getTotalQuantity() > 0,
+        ];
+    }
+
+    #[On('cart-updated')]
     public function refresh(): void
     {
-        // مفيش لازمة لأي كود جوه هنا
-        // مجرد وجود الـ method ده بيخلي Livewire يعيد رسم الـ component ويستدعي with() تاني
+        // مجرد وجود الـ method بيخلي Livewire يعيد رسم الـ component ويستدعي with() تاني
     }
+
     protected function messages(): array
-{
-    return [
-        'phone.regex' => 'رقم الهاتف غير صحيح. مثال: 0987654321 أو +963987654321',
-    ];
-}
+    {
+        return [
+            'phone.regex' => 'رقم الهاتف غير صحيح. مثال: 0987654321 أو +963987654321',
+        ];
+    }
 };
 ?>
 <div>
@@ -195,9 +174,22 @@ public string $phone = '';
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
 
-            <h3 class="text-lg font-bold mb-4">
+            <h3 class="text-lg font-bold mb-3">
                 بيانات التوصيل
             </h3>
+
+            {{-- ==================== شريط الثقة: التوصيل والدفع ==================== --}}
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-medium rounded-full px-3 py-1.5">
+                    🚚 التوصيل خلال ساعة
+                </span>
+                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full px-3 py-1.5">
+                    💵 الدفع كاش عند الاستلام
+                </span>
+                <span class="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-full px-3 py-1.5">
+                    📱 أو عبر شام كاش
+                </span>
+            </div>
 
             @error('cart')
                 <div class="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
@@ -208,7 +200,7 @@ public string $phone = '';
             @if ($freeDeliveryThreshold && $deliveryFee > 0)
                 <div class="bg-orange-50 text-orange-700 text-sm rounded-lg p-3 mb-4">
                     أضف منتجات بقيمة
-                    {{ number_format($freeDeliveryThreshold - $subtotal,2) }}
+                    {{ number_format($freeDeliveryThreshold - $subtotal, 2) }}
                     ل.س للحصول على توصيل مجاني 🎉
                 </div>
             @endif
@@ -223,6 +215,7 @@ public string $phone = '';
                     <input
                         type="text"
                         wire:model="name"
+                        placeholder="مثال: عبدالباسط الساروت"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
 
                     @error('name')
@@ -232,62 +225,21 @@ public string $phone = '';
 
                 <div>
                     <label class="block text-sm font-medium mb-1">
-                        الحي
+                        العنوان الكامل
                     </label>
 
-                    <input
-                        type="text"
-                        wire:model="area"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                    <textarea
+                        wire:model="address"
+                        rows="2"
+                        placeholder="مثال: الخالدية، مقابل جنينة العلو ، بناء 12، طابق 7"
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
 
-                    @error('area')
+                    @error('address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">
-                        اسم الشارع
-                    </label>
-
-                    <input
-                        type="text"
-                        wire:model="street"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-
-                    @error('street')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">
-                            رقم العمارة
-                        </label>
-
-                        <input
-                            type="text"
-                            wire:model="building"
-                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">
-                            الطابق
-                        </label>
-
-                        <input
-                            type="text"
-                            wire:model="floor"
-                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-                    </div>
-
-                </div>
-
-                <div>
-
                     <label class="block text-sm font-medium mb-1">
                         رقم التواصل
                     </label>
@@ -302,11 +254,9 @@ public string $phone = '';
                     @error('phone')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
-
                 </div>
 
                 <div>
-
                     <label class="block text-sm font-medium mb-1">
                         ملاحظات
                     </label>
@@ -315,33 +265,27 @@ public string $phone = '';
                         wire:model="notes"
                         rows="2"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
-
                 </div>
 
                 <div class="border-t pt-4 space-y-2">
 
                     <div class="flex justify-between">
                         <span>المجموع الفرعي</span>
-                        <span>{{ number_format($subtotal,2) }} ل.س</span>
+                        <span>{{ number_format($subtotal, 2) }} ل.س</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span>رسوم التوصيل</span>
-
                         <span>
-                            {{ $deliveryFee > 0 ? number_format($deliveryFee,2).' ل.س' : 'مجاني 🎉' }}
+                            {{ $deliveryFee > 0 ? number_format($deliveryFee, 2) . ' ل.س' : 'مجاني 🎉' }}
                         </span>
-
                     </div>
 
                     <div class="flex justify-between font-bold">
-
                         <span>الإجمالي</span>
-
                         <span class="text-orange-600">
-                            {{ number_format($grandTotal,2) }} ل.س
+                            {{ number_format($grandTotal, 2) }} ل.س
                         </span>
-
                     </div>
 
                 </div>
@@ -360,6 +304,10 @@ public string $phone = '';
                     </span>
 
                 </button>
+
+                <p class="text-center text-xs text-gray-500 mt-2">
+                    ✅ رح يوصلك تأكيد الطلب خلال دقائق، والتوصيل خلال ساعة، الدفع كاش أو شام كاش عند الاستلام
+                </p>
 
             </form>
 

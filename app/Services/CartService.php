@@ -138,4 +138,25 @@ class CartService
     {
         return $this->getDetailedItems()->sum('subtotal');
     }
+
+    /**
+     * رسم توصيل ثابت يُقرأ من config/cart.php (وليس من قاعدة البيانات).
+     * صفر إذا كانت السلة فارغة.
+     */
+    public function getDeliveryFee(): float
+    {
+        if ($this->getTotalQuantity() === 0) {
+            return 0.0;
+        }
+
+        return (float) config('cart.delivery_fee', 0);
+    }
+
+    /**
+     * إجمالي المنتجات + التوصيل.
+     */
+    public function getGrandTotal(): float
+    {
+        return $this->getTotalPrice() + $this->getDeliveryFee();
+    }
 }

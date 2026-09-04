@@ -7,14 +7,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-
     protected $fillable = [
         'customer_name',
         'phone',
-        'area',
-        'street',
-        'building',
-        'floor',
+        'address',
         'notes',
         'subtotal',
         'delivery_fee',
@@ -22,10 +18,8 @@ class Order extends Model
         'status',
     ];
 
-
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
-
 }

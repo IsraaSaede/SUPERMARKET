@@ -4,6 +4,24 @@
 
 @section('content')
 
+    {{-- ==================== زر "اطلب الآن" العائم ====================
+         يظهر تلقائيًا فقط إذا كانت السلة غير فارغة، ويعرض عدد القطع،
+         المبلغ، رسم التوصيل، والإجمالي، وينقل مباشرة لصفحة السلة. --}}
+    <livewire:cart-summary-button />
+
+
+    {{-- ==================== شريط خيارات الدفع ==================== --}}
+    <div class="mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+        <span class="flex items-center gap-1.5 font-medium">
+            💵 الدفع عند الاستلام كاش او شام كاش
+        </span>
+        <span class="hidden sm:inline text-slate-300">|</span>
+        <span class="flex items-center gap-1.5">
+            🚚 توصيل لجميع أحياء حمص
+        </span>
+    </div>
+
+
     {{-- ==================== السلايدر ==================== --}}
     @if ($sliders->isNotEmpty())
         <section
@@ -103,6 +121,158 @@
     @endif
 
 
+    {{--
+        ==================== 🔥 العروض الحالية ====================
+        بدون أي حقل أو جدول جديد بقاعدة البيانات: هذا القسم يعرض أي منتج
+        منتمٍ لتصنيف اسمه يحتوي كلمة "عرض" (أنشئ تصنيفًا من لوحة التحكم
+        اسمه مثلاً "عروض" أو "عروض اليوم"، وأي منتج تضعه فيه يظهر هنا
+        تلقائيًا). ملاحظة: بما أنه لا يوجد حقل "السعر قبل الخصم" بجدول
+        المنتجات، لا يمكن عرض سعر مشطوب حقيقي هنا - فقط شارة "عرض خاص".
+    --}}
+    @if ($offers->isNotEmpty())
+        <section class="mb-14">
+
+            <div class="flex items-center gap-2 mb-6 bg-gradient-to-l from-orange-50 to-white border border-orange-100 rounded-2xl p-4 md:p-5">
+                <span class="text-2xl">🔥</span>
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900">
+                        العروض الحالية
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">
+                        منتجات مختارة ضمن عروضنا الحالية
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4 md:gap-5 lg:gap-6">
+
+                @foreach ($offers as $product)
+
+                    @php
+                        $productImageUrl = $product->image_url;
+                    @endphp
+
+                    <div class="group relative bg-white rounded-2xl border border-orange-200 shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+
+                        <span class="absolute top-2 right-2 z-10 bg-orange-600 text-white text-xs font-bold rounded-full px-2 py-1 shadow">
+                            عرض خاص
+                        </span>
+
+                        <div class="aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
+
+                            @if ($productImageUrl)
+                                <img
+                                    src="{{ $productImageUrl }}"
+                                    alt="{{ $product->name }}"
+                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                                >
+                            @else
+                                <span class="text-slate-300 text-5xl">🛒</span>
+                            @endif
+
+                        </div>
+
+                        <div class="p-4">
+
+                            <p
+                                class="font-semibold text-sm md:text-base text-slate-800 truncate"
+                                title="{{ $product->name }}"
+                            >
+                                {{ $product->name }}
+                            </p>
+
+                            <p class="text-orange-600 font-bold text-base md:text-lg mt-1 mb-3">
+                                {{ number_format($product->price, 2) }} ل.س
+                            </p>
+
+                            <livewire:add-to-cart-button
+                                :product-id="$product->id"
+                                wire:key="offer-cart-btn-{{ $product->id }}"
+                            />
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+        </section>
+    @endif
+
+
+    {{--
+        ==================== ⭐ الأكثر مبيعًا ====================
+        محسوبة تلقائيًا من عدد القطع المباعة فعليًا (order_items)،
+        بدون أي حقل أو جدول جديد. يظهر القسم فقط بعد تسجيل مبيعات حقيقية.
+    --}}
+    @if ($bestSellers->isNotEmpty())
+        <section class="mb-14">
+
+            <div class="mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900">
+                    ⭐ الأكثر مبيعًا
+                </h2>
+                <p class="text-sm text-slate-500 mt-1">
+                    المنتجات الأكثر طلبًا من عملائنا
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4 md:gap-5 lg:gap-6">
+
+                @foreach ($bestSellers as $product)
+
+                    @php
+                        $productImageUrl = $product->image_url;
+                    @endphp
+
+                    <div class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+
+                        <div class="aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
+
+                            @if ($productImageUrl)
+                                <img
+                                    src="{{ $productImageUrl }}"
+                                    alt="{{ $product->name }}"
+                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                                >
+                            @else
+                                <span class="text-slate-300 text-5xl">🛒</span>
+                            @endif
+
+                        </div>
+
+                        <div class="p-4">
+
+                            <p
+                                class="font-semibold text-sm md:text-base text-slate-800 truncate"
+                                title="{{ $product->name }}"
+                            >
+                                {{ $product->name }}
+                            </p>
+
+                            <p class="text-orange-600 font-bold text-base md:text-lg mt-1 mb-3">
+                                {{ number_format($product->price, 2) }} ل.س
+                            </p>
+
+                            <livewire:add-to-cart-button
+                                :product-id="$product->id"
+                                wire:key="bestseller-cart-btn-{{ $product->id }}"
+                            />
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+        </section>
+    @endif
+
+
     {{-- ==================== التصنيفات ==================== --}}
     <section class="mb-14">
 
@@ -176,14 +346,14 @@
     </section>
 
 
-    {{-- ==================== المنتجات ==================== --}}
+    {{-- ==================== وصل حديثًا ==================== --}}
     <section>
 
         <div class="flex items-end justify-between mb-6">
 
             <div>
                 <h2 class="text-2xl md:text-3xl font-bold text-slate-900">
-                    أحدث المنتجات
+                    🆕 وصل حديثًا
                 </h2>
 
                 <p class="text-sm text-slate-500 mt-1">
@@ -202,13 +372,7 @@
 
                     {{-- صورة المنتج --}}
                     @php
-                        $productImage = $product->image;
-
-                        $productImageUrl = $productImage
-                            ? (str_starts_with($productImage, 'http://') || str_starts_with($productImage, 'https://')
-                                ? $productImage
-                                : asset('storage/' . $productImage))
-                            : null;
+                        $productImageUrl = $product->image_url;
                     @endphp
 
                     <div class="aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
@@ -264,12 +428,11 @@
             @endforelse
 
         </div>
-</div>
 
-<div class="mt-10 flex justify-center">
-{{ $products->links('vendor.pagination.tailwind') }}</div>
+        <div class="mt-10 flex justify-center">
+            {{ $products->links('vendor.pagination.tailwind') }}
+        </div>
 
-</section>
     </section>
 
 @endsection
