@@ -42,7 +42,23 @@ unset($__split);
         </span>
     </div>
 
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+        <div class="flex items-start gap-3">
+            <div class="text-2xl">💡</div>
 
+            <div>
+                <h4 class="font-bold text-amber-900 text-sm md:text-base">
+                    عم تدور على منتج معين ومالقيته بمتجرنا؟
+                </h4>
+
+                <p class="text-amber-800 text-sm mt-1 leading-6">
+                    اكتب اسم المنتج في
+                    <span class="font-semibold"> الملاحظات</span>
+                   ورح نوصله الك.
+                </p>
+            </div>
+        </div>
+    </div>
     
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($sliders->isNotEmpty()): ?>
         <section
