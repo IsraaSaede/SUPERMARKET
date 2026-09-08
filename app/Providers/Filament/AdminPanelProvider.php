@@ -2,11 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -26,11 +27,18 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
 
+            // Branding
             ->brandName('سوبر ماركت الباشا')
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('3rem')
             ->favicon(asset('images/logo.png'))
 
+            // Filament Shield
+            ->plugins([
+                FilamentShieldPlugin::make(),
+            ])
+
+            // Colors
             ->colors([
                 'primary' => [
                     50 => '#f8fafc',
@@ -45,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
                     900 => '#060b16',
                     950 => '#03060c',
                 ],
+
                 'danger' => [
                     50 => '#fef2f2',
                     100 => '#fee2e2',
@@ -58,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
                     900 => '#731818',
                     950 => '#400909',
                 ],
+
                 'warning' => [
                     50 => '#fff7ed',
                     100 => '#ffedd5',
@@ -73,26 +83,31 @@ class AdminPanelProvider extends PanelProvider
                 ],
             ])
 
+            // Resources
+            // Roles مستثنى لأن Shield يسجله من خلال الـ Plugin
             ->discoverResources(
                 in: app_path('Filament/Resources'),
-                for: 'App\\Filament\\Resources'
+                for: 'App\\Filament\\Resources',
             )
 
+            // Pages
             ->discoverPages(
                 in: app_path('Filament/Pages'),
-                for: 'App\\Filament\\Pages'
+                for: 'App\\Filament\\Pages',
             )
 
+            // Dashboard
             ->pages([
                 Dashboard::class,
             ])
 
-            // Widgets — الاكتشاف التلقائي يكفي وحده، بدون تسجيل يدوي مكرر
+            // Widgets
             ->discoverWidgets(
                 in: app_path('Filament/Widgets'),
-                for: 'App\\Filament\\Widgets'
+                for: 'App\\Filament\\Widgets',
             )
 
+            // Middleware
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -105,6 +120,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
 
+            // Authentication
             ->authMiddleware([
                 Authenticate::class,
             ]);
