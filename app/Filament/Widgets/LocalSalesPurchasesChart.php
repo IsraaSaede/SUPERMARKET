@@ -9,7 +9,7 @@ class LocalSalesPurchasesChart extends ChartWidget
 {
     protected static ?int $sort = 2;
 
-    protected static ?string $heading = 'المبيعات والمشتريات المحلية';
+    protected ?string $heading = 'المبيعات والمشتريات المحلية';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -27,28 +27,49 @@ class LocalSalesPurchasesChart extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'المبيعات',
-                    'data' => $records
-                        ->map(fn ($record) => (float) $record->sales_total)
-                        ->values()
-                        ->toArray(),
-                    'borderColor' => '#10b981', // Emerald Green
-                    'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
+                    'data' => $records->pluck('sales_total')->map(fn ($v) => (float) $v)->toArray(),
+                    'borderColor' => '#22c55e',
+                    'backgroundColor' => 'rgba(34,197,94,0.2)',
+                    'pointBackgroundColor' => '#22c55e',
+                    'pointBorderColor' => '#22c55e',
+                    'pointRadius' => 4,
+                    'borderWidth' => 3,
+                    'fill' => false,
+                    'tension' => 0.35,
                 ],
                 [
                     'label' => 'المشتريات',
-                    'data' => $records
-                        ->map(fn ($record) => (float) $record->purchases_total)
-                        ->values()
-                        ->toArray(),
-                    'borderColor' => '#ef4444', // Red
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
+                    'data' => $records->pluck('purchases_total')->map(fn ($v) => (float) $v)->toArray(),
+                    'borderColor' => '#ef4444',
+                    'backgroundColor' => 'rgba(239,68,68,0.2)',
+                    'pointBackgroundColor' => '#ef4444',
+                    'pointBorderColor' => '#ef4444',
+                    'pointRadius' => 4,
+                    'borderWidth' => 3,
+                    'fill' => false,
+                    'tension' => 0.35,
                 ],
             ],
 
             'labels' => $records
                 ->map(fn ($record) => $record->date->format('d/m'))
-                ->values()
                 ->toArray(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                ],
+            ],
+            'elements' => [
+                'line' => [
+                    'borderWidth' => 3,
+                ],
+            ],
         ];
     }
 
