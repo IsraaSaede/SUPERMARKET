@@ -19,27 +19,20 @@ class Dashboard extends BaseDashboard
 {
     use HasFiltersForm;
 
-    /**
-     * فلاتر لوحة التحكم
-     */
     public function filtersForm(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('تصفية بيانات المبيعات والمشتريات')
+                Section::make('فلترة المبيعات والمشتريات')
                     ->schema([
                         DatePicker::make('start_date')
                             ->label('من تاريخ')
                             ->default(now()->startOfMonth())
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
                             ->live(),
 
                         DatePicker::make('end_date')
                             ->label('إلى تاريخ')
                             ->default(now())
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
                             ->live(),
                     ])
                     ->columns(2)

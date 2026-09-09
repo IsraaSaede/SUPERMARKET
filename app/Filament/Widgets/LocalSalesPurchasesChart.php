@@ -24,11 +24,6 @@ class LocalSalesPurchasesChart extends ChartWidget
         $endDate = $this->pageFilters['end_date']
             ?? now()->toDateString();
 
-        // إذا أدخل المستخدم التاريخين بالعكس
-        if ($startDate > $endDate) {
-            [$startDate, $endDate] = [$endDate, $startDate];
-        }
-
         $records = LocalDailyRecord::query()
             ->whereBetween('date', [
                 $startDate,
@@ -43,15 +38,14 @@ class LocalSalesPurchasesChart extends ChartWidget
                     'label' => 'المبيعات',
                     'data' => $records
                         ->pluck('sales_total')
-                        ->map(fn ($value) => (float) $value)
+                        ->map(fn ($v) => (float) $v)
                         ->toArray(),
 
                     'borderColor' => '#22c55e',
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.15)',
+                    'backgroundColor' => 'rgba(34,197,94,0.2)',
                     'pointBackgroundColor' => '#22c55e',
                     'pointBorderColor' => '#22c55e',
                     'pointRadius' => 4,
-                    'pointHoverRadius' => 6,
                     'borderWidth' => 3,
                     'fill' => false,
                     'tension' => 0.35,
@@ -61,15 +55,14 @@ class LocalSalesPurchasesChart extends ChartWidget
                     'label' => 'المشتريات',
                     'data' => $records
                         ->pluck('purchases_total')
-                        ->map(fn ($value) => (float) $value)
+                        ->map(fn ($v) => (float) $v)
                         ->toArray(),
 
                     'borderColor' => '#ef4444',
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.15)',
+                    'backgroundColor' => 'rgba(239,68,68,0.2)',
                     'pointBackgroundColor' => '#ef4444',
                     'pointBorderColor' => '#ef4444',
                     'pointRadius' => 4,
-                    'pointHoverRadius' => 6,
                     'borderWidth' => 3,
                     'fill' => false,
                     'tension' => 0.35,
@@ -85,30 +78,15 @@ class LocalSalesPurchasesChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-
             'plugins' => [
                 'legend' => [
                     'display' => true,
-                    'position' => 'top',
                 ],
             ],
 
             'elements' => [
                 'line' => [
                     'borderWidth' => 3,
-                ],
-            ],
-
-            'interaction' => [
-                'intersect' => false,
-                'mode' => 'index',
-            ],
-
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
                 ],
             ],
         ];

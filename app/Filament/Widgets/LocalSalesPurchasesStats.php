@@ -15,45 +15,37 @@ class LocalSalesPurchasesStats extends BaseWidget
 
     protected function getStats(): array
     {
-        $startDate = $this->pageFilters['start_date'] ?? now()->startOfMonth()->toDateString();
-        $endDate = $this->pageFilters['end_date'] ?? now()->toDateString();
+        $startDate = $this->pageFilters['start_date']
+            ?? now()->startOfMonth()->toDateString();
 
-        // التأكد من أن التواريخ صحيحة
-        if ($startDate > $endDate) {
-            [$startDate, $endDate] = [$endDate, $startDate];
-        }
+        $endDate = $this->pageFilters['end_date']
+            ?? now()->toDateString();
 
         $records = LocalDailyRecord::query()
             ->whereBetween('date', [
                 $startDate,
                 $endDate,
-            ])
-            ->get();
+            ]);
 
-        $sales = (float) $records->sum('sales_total');
-        $purchases = (float) $records->sum('purchases_total');
+        $sales = (float) (clone $records)->sum('sales_total');
+        $purchases = (float) (clone $records)->sum('purchases_total');
+
         $difference = $sales - $purchases;
 
         return [
             Stat::make(
-                'إجمالي المبيعات',
+                'مبيعات الفترة',
                 number_format($sales, 0) . ' ل.س'
             )
-                ->description(
-                    'من ' . date('d/m/Y', strtotime($startDate))
-                    . ' إلى ' . date('d/m/Y', strtotime($endDate))
-                )
+                ->description("من {$startDate} إلى {$endDate}")
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
 
             Stat::make(
-                'إجمالي المشتريات',
+                'مشتريات الفترة',
                 number_format($purchases, 0) . ' ل.س'
             )
-                ->description(
-                    'من ' . date('d/m/Y', strtotime($startDate))
-                    . ' إلى ' . date('d/m/Y', strtotime($endDate))
-                )
+                ->description("من {$startDate} إلى {$endDate}")
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('warning'),
 
