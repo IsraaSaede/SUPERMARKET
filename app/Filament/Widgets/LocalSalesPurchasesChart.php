@@ -4,9 +4,12 @@ namespace App\Filament\Widgets;
 
 use App\Models\LocalDailyRecord;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class LocalSalesPurchasesChart extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 2;
 
     protected ?string $heading = 'المبيعات والمشتريات المحلية';
@@ -15,10 +18,21 @@ class LocalSalesPurchasesChart extends ChartWidget
 
     protected function getData(): array
     {
+        $startDate = $this->pageFilters['start_date']
+            ?? now()->startOfMonth()->toDateString();
+
+        $endDate = $this->pageFilters['end_date']
+            ?? now()->toDateString();
+
+        // إذا أدخل المستخدم التاريخين بالعكس
+        if ($startDate > $endDate) {
+            [$startDate, $endDate] = [$endDate, $startDate];
+        }
+
         $records = LocalDailyRecord::query()
             ->whereBetween('date', [
-                now()->subDays(29)->toDateString(),
-                now()->toDateString(),
+                $startDate,
+                $endDate,
             ])
             ->orderBy('date')
             ->get();
@@ -27,24 +41,35 @@ class LocalSalesPurchasesChart extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'المبيعات',
-                    'data' => $records->pluck('sales_total')->map(fn ($v) => (float) $v)->toArray(),
+                    'data' => $records
+                        ->pluck('sales_total')
+                        ->map(fn ($value) => (float) $value)
+                        ->toArray(),
+
                     'borderColor' => '#22c55e',
-                    'backgroundColor' => 'rgba(34,197,94,0.2)',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.15)',
                     'pointBackgroundColor' => '#22c55e',
                     'pointBorderColor' => '#22c55e',
                     'pointRadius' => 4,
+                    'pointHoverRadius' => 6,
                     'borderWidth' => 3,
                     'fill' => false,
                     'tension' => 0.35,
                 ],
+
                 [
                     'label' => 'المشتريات',
-                    'data' => $records->pluck('purchases_total')->map(fn ($v) => (float) $v)->toArray(),
+                    'data' => $records
+                        ->pluck('purchases_total')
+                        ->map(fn ($value) => (float) $value)
+                        ->toArray(),
+
                     'borderColor' => '#ef4444',
-                    'backgroundColor' => 'rgba(239,68,68,0.2)',
+                    'backgroundColor' => 'rgba(239, 68, 68, 0.15)',
                     'pointBackgroundColor' => '#ef4444',
                     'pointBorderColor' => '#ef4444',
                     'pointRadius' => 4,
+                    'pointHoverRadius' => 6,
                     'borderWidth' => 3,
                     'fill' => false,
                     'tension' => 0.35,
@@ -60,14 +85,30 @@ class LocalSalesPurchasesChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+
             'plugins' => [
                 'legend' => [
                     'display' => true,
+                    'position' => 'top',
                 ],
             ],
+
             'elements' => [
                 'line' => [
                     'borderWidth' => 3,
+                ],
+            ],
+
+            'interaction' => [
+                'intersect' => false,
+                'mode' => 'index',
+            ],
+
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
                 ],
             ],
         ];

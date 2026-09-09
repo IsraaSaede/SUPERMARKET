@@ -3,92 +3,75 @@
 namespace App\Filament\Widgets;
 
 use App\Models\LocalDailyRecord;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class LocalSalesPurchasesStats extends BaseWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array
     {
-        $today = LocalDailyRecord::whereDate('date', today())->first();
+        $startDate = $this->pageFilters['start_date'] ?? now()->startOfMonth()->toDateString();
+        $endDate = $this->pageFilters['end_date'] ?? now()->toDateString();
 
-        $todaySales = (float) ($today?->sales_total ?? 0);
-        $todayPurchases = (float) ($today?->purchases_total ?? 0);
+        // التأكد من أن التواريخ صحيحة
+        if ($startDate > $endDate) {
+            [$startDate, $endDate] = [$endDate, $startDate];
+        }
 
-        $weekSales = (float) LocalDailyRecord::whereBetween('date', [
-            now()->startOfWeek()->toDateString(),
-            now()->endOfWeek()->toDateString(),
-        ])->sum('sales_total');
+        $records = LocalDailyRecord::query()
+            ->whereBetween('date', [
+                $startDate,
+                $endDate,
+            ])
+            ->get();
 
-        $weekPurchases = (float) LocalDailyRecord::whereBetween('date', [
-            now()->startOfWeek()->toDateString(),
-            now()->endOfWeek()->toDateString(),
-        ])->sum('purchases_total');
-
-        $monthSales = (float) LocalDailyRecord::whereBetween('date', [
-            now()->startOfMonth()->toDateString(),
-            now()->endOfMonth()->toDateString(),
-        ])->sum('sales_total');
-
-        $monthPurchases = (float) LocalDailyRecord::whereBetween('date', [
-            now()->startOfMonth()->toDateString(),
-            now()->endOfMonth()->toDateString(),
-        ])->sum('purchases_total');
-
-        $todayDifference = $todaySales - $todayPurchases;
-        $monthDifference = $monthSales - $monthPurchases;
+        $sales = (float) $records->sum('sales_total');
+        $purchases = (float) $records->sum('purchases_total');
+        $difference = $sales - $purchases;
 
         return [
             Stat::make(
-                'مبيعات اليوم',
-                number_format($todaySales, 0) . ' ل.س'
+                'إجمالي المبيعات',
+                number_format($sales, 0) . ' ل.س'
             )
-                ->description('إجمالي المبيعات المحلية اليوم')
+                ->description(
+                    'من ' . date('d/m/Y', strtotime($startDate))
+                    . ' إلى ' . date('d/m/Y', strtotime($endDate))
+                )
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
 
             Stat::make(
-                'مشتريات اليوم',
-                number_format($todayPurchases, 0) . ' ل.س'
+                'إجمالي المشتريات',
+                number_format($purchases, 0) . ' ل.س'
             )
-                ->description('إجمالي المشتريات المحلية اليوم')
+                ->description(
+                    'من ' . date('d/m/Y', strtotime($startDate))
+                    . ' إلى ' . date('d/m/Y', strtotime($endDate))
+                )
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('warning'),
 
             Stat::make(
-                'الفرق اليوم',
-                number_format($todayDifference, 0) . ' ل.س'
+                'الفرق',
+                number_format($difference, 0) . ' ل.س'
             )
                 ->description('المبيعات ناقص المشتريات')
                 ->descriptionIcon(
-                    $todayDifference >= 0
+                    $difference >= 0
                         ? 'heroicon-m-arrow-trending-up'
                         : 'heroicon-m-arrow-trending-down'
                 )
-                ->color($todayDifference >= 0 ? 'success' : 'danger'),
-
-            Stat::make(
-                'مبيعات هذا الشهر',
-                number_format($monthSales, 0) . ' ل.س'
-            )
-                ->description('إجمالي المبيعات المحلية منذ بداية الشهر')
-                ->color('success'),
-
-            Stat::make(
-                'مشتريات هذا الشهر',
-                number_format($monthPurchases, 0) . ' ل.س'
-            )
-                ->description('إجمالي المشتريات المحلية منذ بداية الشهر')
-                ->color('warning'),
-
-            Stat::make(
-                'الفرق هذا الشهر',
-                number_format($monthDifference, 0) . ' ل.س'
-            )
-                ->description('المبيعات ناقص المشتريات')
-                ->color($monthDifference >= 0 ? 'success' : 'danger'),
+                ->color(
+                    $difference >= 0
+                        ? 'success'
+                        : 'danger'
+                ),
         ];
     }
 }
