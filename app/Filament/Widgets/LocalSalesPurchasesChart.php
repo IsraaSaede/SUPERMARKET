@@ -9,7 +9,7 @@ class LocalSalesPurchasesChart extends ChartWidget
 {
     protected static ?int $sort = 2;
 
-    protected ?string $heading = 'المبيعات والمشتريات المحلية';
+    protected static ?string $heading = 'المبيعات والمشتريات المحلية';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -31,6 +31,8 @@ class LocalSalesPurchasesChart extends ChartWidget
                         ->map(fn ($record) => (float) $record->sales_total)
                         ->values()
                         ->toArray(),
+                    'borderColor' => '#10b981', // Emerald Green
+                    'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
                 ],
                 [
                     'label' => 'المشتريات',
@@ -38,6 +40,8 @@ class LocalSalesPurchasesChart extends ChartWidget
                         ->map(fn ($record) => (float) $record->purchases_total)
                         ->values()
                         ->toArray(),
+                    'borderColor' => '#ef4444', // Red
+                    'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
                 ],
             ],
 

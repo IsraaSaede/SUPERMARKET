@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class LocalDailyRecordResource extends Resource
 {
@@ -43,23 +44,26 @@ class LocalDailyRecordResource extends Resource
      */
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('create', LocalDailyRecord::class) ?? false;
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        return $user?->can('create', LocalDailyRecord::class) ?? false;
     }
 
-    /**
-     * السماح بتعديل السجل فقط لمن لديه صلاحية Update.
-     */
     public static function canEdit($record): bool
     {
-        return auth()->user()?->can('update', $record) ?? false;
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        return $user?->can('update', $record) ?? false;
     }
 
-    /**
-     * السماح بحذف السجل فقط لمن لديه صلاحية Delete.
-     */
     public static function canDelete($record): bool
     {
-        return auth()->user()?->can('delete', $record) ?? false;
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        return $user?->can('delete', $record) ?? false;
     }
 
     public static function form(Schema $schema): Schema
