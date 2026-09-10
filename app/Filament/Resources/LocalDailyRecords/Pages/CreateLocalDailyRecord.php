@@ -13,6 +13,17 @@ class CreateLocalDailyRecord extends CreateRecord
 {
     protected static string $resource = LocalDailyRecordResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('backToList')
+                ->label('الرجوع للقائمة')
+                ->icon('heroicon-o-arrow-right')
+                ->color('gray')
+                ->url(static::$resource::getUrl('index')),
+        ];
+    }
+
     protected function beforeCreate(): void
     {
         $date = Carbon::parse($this->data['date'])->toDateString();
@@ -26,9 +37,17 @@ class CreateLocalDailyRecord extends CreateRecord
         }
     }
 
+    // إظهار زر "حفظ وإنشاء يوم آخر" لتسهيل الإدخال المتتابع للأيام
     protected function getCreateAnotherFormAction(): Action
     {
         return parent::getCreateAnotherFormAction()
-            ->hidden();
+            ->label('حفظ وإضافة يوم آخر')
+            ->color('gray');
+    }
+
+    // التوجيه التلقائي للقائمة بعد الحفظ
+    protected function getRedirectUrl(): string
+    {
+        return static::$resource::getUrl('index');
     }
 }

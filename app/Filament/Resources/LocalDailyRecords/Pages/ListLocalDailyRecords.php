@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\LocalDailyRecords\Pages;
 
 use App\Filament\Resources\LocalDailyRecords\LocalDailyRecordResource;
+use App\Filament\Widgets\LocalSalesPurchasesChart;
+use App\Filament\Widgets\LocalSalesPurchasesStats;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,7 +16,16 @@ class ListLocalDailyRecords extends ListRecords
     {
         return [
             CreateAction::make()
-                ->label('إضافة بيانات يوم'),
+                ->label('إضافة بيانات يوم')
+                ->icon('heroicon-o-plus'),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            LocalSalesPurchasesStats::class,
+            LocalSalesPurchasesChart::class,
         ];
     }
 }
